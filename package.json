@@ -1,0 +1,59 @@
+{
+  "name": "egg-mysqlx",
+  "version": "1.0.0",
+  "description": "mysql plugin for egg",
+  "eggPlugin": {
+    "name": "mysqlx"
+  },
+  "keywords": [
+    "egg",
+    "eggPlugin",
+    "egg-plugin"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/typing/index.d.ts",
+  "dependencies": {
+    "easy-mysqlx": "^1.0.0"
+  },
+  "devDependencies": {
+    "autod": "^3.0.1",
+    "autod-egg": "^1.1.0",
+    "egg": "^2.16.0",
+    "egg-bin": "^4.11.0",
+    "egg-ci": "^1.11.0",
+    "egg-mock": "^3.21.0",
+    "eslint": "^5.13.0",
+    "eslint-config-egg": "^7.1.0",
+    "typescript": "^4.5.4"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {
+    "test": "egg-bin test --typescript",
+    "cov": "egg-bin cov --typescript",
+    "lint": "eslint \"src/**/*.ts\"",
+    "ci": "npm run lint && npm run cov && npm run tsc",
+    "autod": "autod",
+    "tsc": "tsc"
+  },
+  "files": [
+    "app.js",
+    "agent.js",
+    "config",
+    "lib"
+  ],
+  "ci": {
+    "version": "8, 10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eggjs/egg-mysqlx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eggjs/egg/issues"
+  },
+  "homepage": "https://github.com/eggjs/egg-mysqlx#readme",
+  "author": "lancernix",
+  "license": "MIT"
+}
