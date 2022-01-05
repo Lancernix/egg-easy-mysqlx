@@ -14,7 +14,7 @@
   "main": "lib/index.js",
   "types": "lib/typing/index.d.ts",
   "dependencies": {
-    "easy-mysqlx": "^1.0.2"
+    "easy-mysqlx": "^1.0.0"
   },
   "devDependencies": {
     "autod": "^3.0.1",
