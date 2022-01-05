@@ -1,6 +1,6 @@
 'use strict';
 
-exports.mysqlx = {
+exports.mysql = {
   default: {
     database: null,
     connectionLimit: 5,
