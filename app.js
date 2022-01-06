@@ -1,7 +1,7 @@
 'use strict';
 
-const mysql = require('./lib/index');
+const mysqlx = require('./lib/index');
 
 module.exports = app => {
-  if (app.config.mysql.app) mysql(app);
+  if (app.config.mysqlx.app) mysqlx(app);
 };

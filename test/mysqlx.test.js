@@ -2,11 +2,11 @@
 
 const mock = require('egg-mock');
 
-describe('test/mysqlxx.test.ts', () => {
+describe('test/mysqlx.test.ts', () => {
   let app;
   before(() => {
     app = mock.app({
-      baseDir: 'apps/mysqlxx-test',
+      baseDir: 'apps/mysqlx-test',
     });
     return app.ready();
   });
@@ -19,7 +19,6 @@ describe('test/mysqlxx.test.ts', () => {
   afterEach(mock.restore);
 
   it('should GET /', () => {
-    return app.httpRequest().get('/').expect('hi, mysqlx')
-      .expect(200);
+    return app.httpRequest().get('/').expect('hi, mysqlx').expect(200);
   });
 });

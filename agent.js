@@ -1,7 +1,7 @@
 'use strict';
 
-const mysql = require('./lib/index');
+const mysqlx = require('./lib/index');
 
 module.exports = agent => {
-  if (agent.config.mysql.agent) mysql(agent);
+  if (agent.config.mysqlx.agent) mysqlx(agent);
 };

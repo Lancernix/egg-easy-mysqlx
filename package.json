@@ -1,9 +1,9 @@
 {
-  "name": "egg-mysqlxx",
-  "version": "1.0.5",
+  "name": "egg-easy-mysqlx",
+  "version": "1.0.6",
   "description": "mysql plugin for egg",
   "eggPlugin": {
-    "name": "mysqlxx"
+    "name": "mysqlx"
   },
   "keywords": [
     "egg",
@@ -48,12 +48,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Lancernix/egg-mysqlxx.git"
+    "url": "git+https://github.com/Lancernix/egg-easy-mysqlx.git"
   },
   "bugs": {
-    "url": "https://github.com/Lancernix/egg-mysqlxx/issues"
+    "url": "https://github.com/Lancernix/egg-easy-mysqlx/issues"
   },
-  "homepage": "https://github.com/Lancernix/egg-mysqlxx#readme",
+  "homepage": "https://github.com/Lancernix/egg-easy-mysqlx#readme",
   "author": "lancernix",
   "license": "MIT"
 }
