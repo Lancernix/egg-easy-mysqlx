@@ -1,75 +1,321 @@
-# egg-mysqlx
+# egg-easy-mysqlx
 
-[![NPM version][npm-image]][npm-url]
-[![build status][travis-image]][travis-url]
-[![Test coverage][codecov-image]][codecov-url]
-[![David deps][david-image]][david-url]
-[![Known Vulnerabilities][snyk-image]][snyk-url]
-[![npm download][download-image]][download-url]
-
-[npm-image]: https://img.shields.io/npm/v/egg-mysqlx.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/egg-mysqlx
-[travis-image]: https://img.shields.io/travis/eggjs/egg-mysqlx.svg?style=flat-square
-[travis-url]: https://travis-ci.org/eggjs/egg-mysqlx
-[codecov-image]: https://img.shields.io/codecov/c/github/eggjs/egg-mysqlx.svg?style=flat-square
-[codecov-url]: https://codecov.io/github/eggjs/egg-mysqlx?branch=master
-[david-image]: https://img.shields.io/david/eggjs/egg-mysqlx.svg?style=flat-square
-[david-url]: https://david-dm.org/eggjs/egg-mysqlx
-[snyk-image]: https://snyk.io/test/npm/egg-mysqlx/badge.svg?style=flat-square
-[snyk-url]: https://snyk.io/test/npm/egg-mysqlx
-[download-image]: https://img.shields.io/npm/dm/egg-mysqlx.svg?style=flat-square
-[download-url]: https://npmjs.org/package/egg-mysqlx
-
-<!--
-Description here.
--->
-
-## 依赖说明
-
-### 依赖的 egg 版本
-
-egg-mysqlx 版本 | egg 1.x
---- | ---
-1.x | 😁
-0.x | ❌
-
-### 依赖的插件
-<!--
-
-如果有依赖其它插件，请在这里特别说明。如
-
-- security
-- multipart
-
--->
+一个 egg.js 的 mysql 插件，提供了常用的 CURD API 和比较完整的操作符，并增加了 TypeScript 支持，可以看作是 egg-mysql 的扩展。
 
 ## 开启插件
 
-```js
+```JS
 // config/plugin.js
-exports.mysqlx = {
-  enable: true,
-  package: 'egg-mysqlx',
+module.exports = {
+  ...
+  mysqlx: {
+    enable: true,
+    package: 'egg-easy-mysqlx',
+  },
+  ...
 };
 ```
 
-## 使用场景
-
-- Why and What: 描述为什么会有这个插件，它主要在完成一件什么事情。
-尽可能描述详细。
-- How: 描述这个插件是怎样使用的，具体的示例代码，甚至提供一个完整的示例，并给出链接。
-
 ## 详细配置
 
-请到 [config/config.default.js](config/config.default.js) 查看详细配置项说明。
+配置同 egg-mysql，详细配置可移步 [egg-mysql 配置页面](https://eggjs.org/zh-cn/tutorials/mysql.html#egg-mysql)查看。
 
-## 单元测试
+```JS
+// config/config.default.js
+module.exports = appInfo => {
+  ...
+  config.mysqlx = {
+    client: {
+      host: '10.188.36.4',
+      port: 8002,
+      user: 'tom',
+      password: '123456',
+      database: 'faq',
+    },
+    app: true,
+    agent: false,
+  };
+  ...
+  return {
+    ...config,
+    ...userConfig,
+  };
+};
 
-<!-- 描述如何在单元测试中使用此插件，例如 schedule 如何触发。无则省略。-->
+```
+
+## 基本使用
+
+> 若无特殊说明，以下方法的参数均为对象。
+
+### Read
+
+使用 `select` 方法可以进行数据查询。`select` 方法的参数包含 `table` 、 `column` 、 `where` 、 `limit` 、 `offset` 和 `order` 6 个 key。
+
+* `table` —— 要操作的数据表名（必需）
+* `column` —— 字符串数组，需要查询的列（可选）
+* `where` —— 查询条件（可选）
+* `limit` —— 返回结果数量，默认为 1（可选）
+* `offset` —— 偏移量，默认为 0（可选）
+* `order` —— 排序（可选）
+
+返回结果为一个对象数组。
+
+`where` 对象较为复杂，这里单独说明一下。`where` 是一个拥有固定 key 的对象，每一个 key 都表示 sql 语句中的一个逻辑运算符，有：
+
+* `eq` —— equal（=）
+* `ne` —— not equal（!=）
+* `gt` —— greater than（>）
+* `ge` —— greater than or equal（>=）
+* `lt` —— less than（<）
+* `le` —— less than or equal（<=）
+* `in` —— in
+* `ni` —— not in
+* `bw` —— between ... and ...
+* `like` —— like
+* `or` —— or
+
+上述的每个 key 对应的 value 也是一个对象（`or` 除外，其对应的 value 为一个数组），该对象则为数据表中的字段和对应的值，如：
+
+* `eq: { name: 'tom' }` ==> `name = 'tom'`
+* `eq: { name: 'tom', age: 6 }` ==> `name = 'tom' AND age = 6`
+* `bw: { age: [6, 12] }` ==> `age BETWEEN 6 AND 12`
+* `or: [{ eq: { name: 'tom' } }, { eq: { name: 'jerry' } }]` ==> `name = 'tom' OR name = 'jerry'`
+
+```JS
+const result = await this.app.mysqlx.select({
+  table: 'test_table',
+  column: ['id', 'name'],
+  where: {
+    or: [{ eq: { name: 'harden', status: 0 }, le: { age: 30 } }, { eq: { name: 'tim' } }],
+  },
+  limit: 10,
+});
+// 查询结果
+result = [
+  { id: 24, name: 'tim' },
+  { id: 57, name: 'harden' },
+];
+
+const result = await this.app.mysqlx.select({
+  table: 'test_table',
+  // column 为空等同于不填，均表示 SELECT * FROM xxx
+  column: [],
+  where: {
+    or: [{ eq: { name: 'harden', status: 0 }, le: { age: 30 } }, { eq: { name: 'tim' } }],
+  },
+});
+// 查询结果
+result = [
+  {
+    id: 24,
+    name: 'tim',
+    age: 90,
+    status: 1,
+    created_time: '2021-12-31 17:35:41',
+    msg: 'message',
+  },
+];
+```
+
+### Create
+
+使用 `insert` 方法可以进行单条或者批量插入。`insert` 方法的参数包含 `table` 和 `value` 两个 key。
+
+* `table` —— 要操作的数据表名（必需）
+* `value` —— 单条插入时，是一个对象；批量插入时，则是一个对象数组（必需）
+
+执行结果通过 `affectedRows` 进行判断。
+
+```JS
+// 单条插入
+const result = await this.app.mysqlx.insert({
+  table: 'test_table',
+  value: {
+    name: 'timo',
+    age: '9',
+    status: 0,
+  },
+});
+// 插入成功
+result.affectedRows ==> 1;
+
+// 批量插入
+const result = await this.app.mysqlx.insert({
+  table: 'test_table',
+  value: [
+    {
+      name: 'yasuo',
+      age: '21',
+      status: 1,
+    },
+    {
+      name: 'yohn',
+      age: '24',
+      status: 1,
+    },
+    {
+      name: 'akl',
+      age: '26',
+      status: 0,
+    },
+  ],
+});
+// 插入成功
+result.affectedRows ==> 3;
+```
+
+### Update
+
+使用 `update` 方法可以进行数据更新。`update` 方法的参数包含 `table` 、`value` 和 `where` 三个 key。
+
+* `table` —— 要操作的数据表名（必需）
+* `value` —— 更改的数据（必需）
+* `where` —— 筛选条件（必需）
+
+执行结果同样通过 `affectedRows` 进行判断。
+
+```JS
+const result = await this.app.mysqlx.update({
+  table: 'test_table',
+  value: { msg: 'update timo message' },
+  where: {
+    eq: { name: 'timo' },
+  },
+});
+```
+
+### Delete
+
+使用 `delete` 方法可以进行数据删除。`delete` 方法的参数包含 `table` 和 `where` 两个 key。
+
+* `table` —— 要操作的数据表名（必需）
+* `where` —— 筛选条件（可选）
+
+执行结果同样通过 `affectedRows` 进行判断。
+
+```JS
+const result = await this.app.mysqlx.delete({
+  table: 'test_table',
+  where: {
+    eq: { name: 'timo' },
+  },
+});
+
+// where 不填时，会删除表中所有数据，慎用
+const result = await this.app.mysqlx.delete({
+  table: 'test_table',
+});
+```
+
+### Count
+
+为了方便使用，也提供了 `count` 方法用于查询符合条件的数据条数。`count` 方法的参数同 `delete` 方法。
+
+返回结果为 number。
+
+```JS
+const result = await this.app.mysqlx.count({
+  table: TABLE,
+  where: {
+    eq: { status: 1 },
+  },
+});
+// 结果
+result ==> 13;
+```
+
+### Query
+
+可能上述提供的方法不能完全满足实际需求，我们同样也提供了 `query` 方法用于手写 sql 语句。`query` 方法的参数**不是对象**，其有两个参数：`sql` 和 `values`。
+
+* `sql` —— 要执行的 sql 语句（必需）
+* `values` —— where 子句中对应的值（可选）
+
+```JS
+const result = await this.app.mysqlx.query(`SELECT id, name, age FROM test_table WHERE id >= ? AND status = ?;`, [50, 0]);
+```
+
+上面的用法是推荐用法，这样插件会对语句进行预处理（prepared），可以有效防止 sql 注入。
+
+如果习惯使用拼接字符串，则需要使用 `escape` 方法对传入的值转义一下，同样也可以防止 sql 注入。
+
+```JS
+const escapedId = this.app.mysqlx.escape(id);
+const escapedStatus = this.app.mysqlx.escape(status);
+const result = await this.app.mysqlx.query(`SELECT id, name, age FROM test_table WHERE id >= ${escapedId} AND status = ${escapedStatus};`);
+```
+
+## 事务
+
+mysql 一个事务将一组连续的数据库操作放在一个单一的工作单元来执行。该组内的每个单独的操作是成功，事务才能成功。如果事务中的任何操作失败，则整个事务将失败。
+
+插件同样也提供了**手动**和**自动**两种事务处理的方式。
+
+### 手动控制
+
+`beginTransaction` 、 `commit` 和 `rollback` 用于手动执行事务。
+
+```JS
+// 开启事务
+const tran = await this.app.mysqlx.beginTransaction();
+  try {
+    // 多次操作
+    const res = await tran.select({
+      table: 'test_table',
+      column: ['id'],
+      where: { eq: { name: 'yohn' } },
+    });
+    const res1 = await tran.update({
+      table: 'test_table',
+      value: { msg: 'update yohn message wohhhhh' },
+      where: { eq: { id: res[0].id } },
+    });
+    // 操作完成，提交事务
+    await tran.commit();
+    return true;
+  } catch (error) {
+    // 操作有失败，回滚事务
+    await tran.rollback();
+    throw error;
+  }
+```
+
+### 自动事务
+
+`autoTransaction` 方法用于自动执行事务。其有两个参数：`scope` 和 `ctx`。
+
+* `scope` —— 一个包含多次 CURD 操作的异步函数
+* `ctx` —— 上下文对象，即 eggjs 中的 ctx，传入 ctx 可以保证即便在出现事务嵌套的情况下，一次请求中同时只有一个激活状态的事务
+
+```JS
+const result = await this.app.mysqlx.autoTransaction(async tran => {
+  const res = await tran.select({
+    table: TABLE,
+    column: ['id'],
+    where: { eq: { name: 'yohn' } },
+  });
+  expect(res).toEqual([{ id: 60 }]);
+  const res1 = await tran.update({
+    table: TABLE,
+    value: { msg: 'update yohn message' },
+    where: { eq: { id: res[0].id } },
+  });
+  expect(res1.affectedRows).toEqual(1);
+  const result = await tran.insert({
+    table: TABLE,
+    value: {
+      name: 'vn',
+      age: 77,
+    },
+  });
+  return result;
+});
+```
 
 ## 提问交流
 
-请到 [egg issues](https://github.com/eggjs/egg/issues) 异步交流。
+请到移步至 [egg-easy-mysqlx issues](https://github.com/Lancernix/egg-easy-mysqlx/issues) 交流。
 
 ## License
 
