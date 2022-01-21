@@ -171,7 +171,7 @@ result.affectedRows ==> 3;
 
 * `table` —— 要操作的数据表名（必需）
 * `value` —— 更改的数据（必需）
-* `where` —— 筛选条件（必需）
+* `where` —— 筛选条件（可选）
 
 执行结果同样通过 `affectedRows` 进行判断。
 
@@ -295,13 +295,11 @@ const result = await this.app.mysqlx.autoTransaction(async tran => {
     column: ['id'],
     where: { eq: { name: 'yohn' } },
   });
-  expect(res).toEqual([{ id: 60 }]);
   const res1 = await tran.update({
     table: TABLE,
     value: { msg: 'update yohn message' },
     where: { eq: { id: res[0].id } },
   });
-  expect(res1.affectedRows).toEqual(1);
   const result = await tran.insert({
     table: TABLE,
     value: {
@@ -311,6 +309,34 @@ const result = await this.app.mysqlx.autoTransaction(async tran => {
   });
   return result;
 });
+```
+
+## 内置函数
+
+如果需要使用 mysql 内置函数，最好通过 `literal` 方法，该方法会对输入的 function string 进行格式化并且进行必要的处理，不通过此方法的内置函数不会生效（考虑到特殊情况，可能需要存储的就是这样的字符串，那么执行这个函数就是不合理的）。另一种可以使用内置函数的方式是直接写 sql 字符串。
+
+```JS
+await this.app.mysqlx.update({
+  table: TABLE,
+  value: {
+    name: client.literal("concat('tom', ' and ', 'jerry')"), // concat 拼接字符串
+    msg: 'now()', // 这里没有使用 literal 方法，所以写入数据库中的就是 'now()'
+  },
+  where: { eq: { name: 'yohn' } },
+});
+const result = await client.select({
+  table: TABLE,
+  column: ['name', 'msg'],
+  where: {
+    eq: { id: 2 },
+  },
+});
+return result;
+// 结果
+result ==> [{ name: 'tom and jerry', msg: 'now()' }]
+
+// 直接使用 sql 字符串
+await this.app.mysqlx.query(`UPDATE ${TABLE} SET name = CONCAT('tom', ' and ', 'jerry') AND msg = 'now()' WHERE name = 'yohn';`);
 ```
 
 ## 提问交流

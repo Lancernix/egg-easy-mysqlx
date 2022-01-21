@@ -171,7 +171,7 @@ Use `update` method can update data. The object parameter of the method includes
 
 * `table` —— table name（required）
 * `value` —— update data（required）
-* `where` —— condition（required）TODO:
+* `where` —— condition（not required）
 
 The result is also judged by `affectedRows`.
 
@@ -210,7 +210,7 @@ const result = await this.app.mysqlx.delete({
 
 ### Count
 
-为了方便使用，也提供了 `count` 方法用于查询符合条件的数据条数。`count` 方法的参数同 `delete` 方法。
+For ease of use, the `count` method is also provided to query the number of data. The parameters of `count` method are the same as those of `delete` method.
 
 The result is a number.
 
@@ -227,7 +227,7 @@ result ==> 13;
 
 ### Query
 
-可能上述提供的方法不能完全满足实际需求，我们同样也提供了 `query` 方法用于手写 sql 语句。`query` 方法的参数**不是对象**，其有两个参数：`sql` 和 `values`。
+Maybe the above methods can not fully meet the actual needs. We also provide the `query` method for handwritten SQL statements. The parameter of the `query` method is **not an object**. It has two parameters: `sql` and `values`.
 
 * `sql` —— sql string（required）
 * `values` —— corresponding values in where clause（not required）
@@ -238,7 +238,7 @@ const result = await this.app.mysqlx.query(`SELECT id, name, age FROM test_table
 
 The above usage is recommended. In this way, the plugin will preprocess the statements, which can effectively prevent sql injection.
 
-如果习惯使用拼接字符串，则需要使用 `escape` 方法对传入的值转义一下，同样也可以防止 sql 注入。
+If you are used to splicing string, you need to use the `escape` method to escape the incoming value, which can also prevent SQL injection.
 
 ```JS
 const escapedId = this.app.mysqlx.escape(id);
@@ -248,13 +248,13 @@ const result = await this.app.mysqlx.query(`SELECT id, name, age FROM test_table
 
 ## Transaction
 
-mysql 一个事务将一组连续的数据库操作放在一个单一的工作单元来执行。该组内的每个单独的操作是成功，事务才能成功。如果事务中的任何操作失败，则整个事务将失败。
+A mysql transaction is a set of continuous database operations which performed as a single unit of work. Each individual operation within the group is successful and the transaction succeeds. If one part of the transaction fails, then the entire transaction fails.
 
-插件同样也提供了**手动**和**自动**两种事务处理的方式。
+The plugin also provides **manual** and **automatic** transaction processing.
 
 ### Manual Transaction
 
-`beginTransaction` 、 `commit` 和 `rollback` 用于手动执行事务。
+`beginTransaction` 、 `commit` and `rollback` are used to manually execute transactions.
 
 ```JS
 // start transaction
@@ -282,10 +282,10 @@ const tran = await this.app.mysqlx.beginTransaction();
 
 ### Auto Transaction
 
-`autoTransaction` 方法用于自动执行事务。其有两个参数：`scope` 和 `ctx`。
+`autoTransaction` method is used to manually execute transactions. It has two parameters：`scope` and `ctx`.
 
-* `scope` —— 一个包含多次 CURD 操作的异步函数
-* `ctx` —— 上下文对象，即 eggjs 中的 ctx，传入 ctx 可以保证即便在出现事务嵌套的情况下，一次请求中同时只有一个激活状态的事务
+* `scope` —— An asynchronous function that contains multiple CURD operations
+* `ctx` —— The context object of current request, it will ensures that even in the case of a nested transaction, there is only one active transaction in a request at the same time.
 
 ```JS
 const result = await this.app.mysqlx.autoTransaction(async tran => {
