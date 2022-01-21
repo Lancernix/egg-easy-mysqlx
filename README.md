@@ -312,6 +312,34 @@ const result = await this.app.mysqlx.autoTransaction(async tran => {
 });
 ```
 
+## Build-in Function
+
+If you need to use mysql built-in function, you'd better use the `literal` method, which will format the input function string and carry out necessary processing. The built-in function without this method will not take effect (considering the special circumstances, string like `now()` may need to be stored, so it's unreasonable to execute `now()` function). Another way to use built-in functions is to write sql strings directly.
+
+```JS
+await this.app.mysqlx.update({
+  table: TABLE,
+  value: {
+    name: client.literal("concat('tom', ' and ', 'jerry')"), // concat string
+    msg: 'now()', // doesn't use literal
+  },
+  where: { eq: { name: 'yohn' } },
+});
+const result = await client.select({
+  table: TABLE,
+  column: ['name', 'msg'],
+  where: {
+    eq: { id: 2 },
+  },
+});
+return result;
+// result
+result ==> [{ name: 'tom and jerry', msg: 'now()' }]
+
+// use sql string
+await this.app.mysqlx.query(`UPDATE ${TABLE} SET name = CONCAT('tom', ' and ', 'jerry') AND msg = 'now()' WHERE name = 'yohn';`);
+```
+
 ## Issue
 
 [egg-easy-mysqlx issues](https://github.com/Lancernix/egg-easy-mysqlx/issues).
