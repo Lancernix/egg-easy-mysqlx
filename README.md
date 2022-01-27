@@ -55,7 +55,7 @@ Use `select` method can select data what you want. The object parameter of the m
 * `table` —— table name（required）
 * `column` —— columns that you want（not required）
 * `where` —— select conditions（not required）
-* `limit` —— number of returned data，default is 1（not required）
+* `limit` —— number of returned data（not required）
 * `offset` —— offset，default is 0（not required）
 * `order` —— order（not required）
 
