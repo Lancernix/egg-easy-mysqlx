@@ -1,6 +1,6 @@
 {
   "name": "egg-easy-mysqlx",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "mysql plugin for egg",
   "eggPlugin": {
     "name": "mysqlx"
