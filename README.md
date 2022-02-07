@@ -208,6 +208,24 @@ const result = await this.app.mysqlx.delete({
 });
 ```
 
+### Get
+
+Sometimes we will use unique key for query, so the `get` method is also provided to query **a piece of** data that meets the conditions. The parameters of the `get` method are similar to those of the select method, but there are no `offset` and `limit`.
+
+The result is a object.
+
+```JS
+const result = await this.app.mysqlx.get({
+  table: 'test_table',
+  column: ['id', 'name'],
+  where: {
+    eq: { id: 2 },
+  },
+});
+// result
+result = { id: 2, name: 'tom' };
+```
+
 ### Count
 
 For ease of use, the `count` method is also provided to query the number of data. The parameters of `count` method are the same as those of `delete` method.

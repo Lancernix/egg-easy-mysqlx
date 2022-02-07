@@ -208,6 +208,24 @@ const result = await this.app.mysqlx.delete({
 });
 ```
 
+### Get
+
+有时可能会使用唯一键进行查询，所以也提供了 `get` 方法用于查询符合条件的**一条**数据。`get` 方法的参数类似于 `select` 方法，但没有 `offset` 和 `limit`。
+
+返回结果为一个对象。
+
+```JS
+const result = await this.app.mysqlx.get({
+  table: 'test_table',
+  column: ['id', 'name'],
+  where: {
+    eq: { id: 2 },
+  },
+});
+// 结果
+result = { id: 2, name: 'tom' };
+```
+
 ### Count
 
 为了方便使用，也提供了 `count` 方法用于查询符合条件的数据条数。`count` 方法的参数同 `delete` 方法。
