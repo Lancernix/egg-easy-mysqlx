@@ -1,6 +1,6 @@
 {
   "name": "egg-easy-mysqlx",
-  "version": "1.1.1",
+  "version": "1.1.2-beta1",
   "description": "mysql plugin for egg",
   "eggPlugin": {
     "name": "mysqlx"
@@ -14,7 +14,7 @@
   "main": "lib/index.js",
   "types": "lib/typing/index.d.ts",
   "dependencies": {
-    "easy-mysqlx": "^1.0.7"
+    "easy-mysqlx": "^2.0.1-beta1"
   },
   "devDependencies": {
     "autod": "^3.0.1",
